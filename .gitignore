@@ -1,0 +1,19 @@
+# ESPHome
+.esphome/
+*.pioenvs/
+*.piolibdeps/
+
+# PlatformIO
+.pio/
+
+# Python
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Fichiers temporaires
+*.tmp
+*.bak
+.DS_Store
