@@ -1,0 +1,5 @@
+esphome:
+  name: radio-analyzer-test
+
+esp32:
+  board: esp32dev
