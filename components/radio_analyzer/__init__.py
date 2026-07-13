@@ -6,7 +6,7 @@ from esphome.components import sensor
 from esphome.const import CONF_ID
 
 
-DEPENDENCIES = ["sensor"]
+DEPENDENCIES = ["sensor", "sx127x"]
 
 
 radio_analyzer_ns = cg.esphome_ns.namespace("radio_analyzer")
