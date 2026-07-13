@@ -13,7 +13,5 @@ __pycache__/
 # VS Code
 .vscode/
 
-# Fichiers temporaires
-*.tmp
-*.bak
+# Systèmes
 .DS_Store
