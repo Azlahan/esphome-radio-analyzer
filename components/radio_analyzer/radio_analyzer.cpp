@@ -17,7 +17,16 @@ void RadioAnalyzer::loop() {
 
     last_update_ = millis();
 
+
     float rssi = -100;
+
+
+    ESP_LOGD(
+      "radio_analyzer",
+      "RSSI mesure: %.0f dBm",
+      rssi
+    );
+
 
     if (rssi_sensor_ != nullptr) {
       rssi_sensor_->publish_state(rssi);
