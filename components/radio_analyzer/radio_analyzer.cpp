@@ -1,41 +1,53 @@
 #include "radio_analyzer.h"
+#include "esphome/core/log.h"
 
 namespace esphome {
 namespace radio_analyzer {
 
+static const char *const TAG = "radio_analyzer";
+
 
 void RadioAnalyzer::setup() {
-
-  ESP_LOGI("radio_analyzer", "Radio Analyzer démarrage");
-
+  ESP_LOGI(TAG, "Radio Analyzer initialisé");
 }
 
 
-void RadioAnalyzer::loop() {
-
-  if (millis() - last_update_ > 1000) {
-
-    last_update_ = millis();
+void RadioAnalyzer::dump_config() {
+  ESP_LOGCONFIG(TAG, "Radio Analyzer");
+}
 
 
-    float rssi = -100;
+void RadioAnalyzer::on_packet(
+    const std::vector<uint8_t> &packet,
+    float rssi,
+    float snr) {
+
+  this->packet_count_++;
+
+  ESP_LOGI(TAG, "==============================");
+  ESP_LOGI(TAG, "Packet #%u", this->packet_count_);
+  ESP_LOGI(TAG, "Length : %d bytes", packet.size());
+  ESP_LOGI(TAG, "RSSI   : %.1f dBm", rssi);
+  ESP_LOGI(TAG, "SNR    : %.1f dB", snr);
 
 
-    ESP_LOGD(
-      "radio_analyzer",
-      "RSSI mesure: %.0f dBm",
-      rssi
-    );
+  std::string payload;
 
+  char buffer[4];
 
-    if (rssi_sensor_ != nullptr) {
-      rssi_sensor_->publish_state(rssi);
-    }
-
+  for (auto byte : packet) {
+    snprintf(buffer, sizeof(buffer), "%02X ", byte);
+    payload += buffer;
   }
 
-}
+  ESP_LOGI(TAG, "Payload: %s", payload.c_str());
+  ESP_LOGI(TAG, "==============================");
 
 
+  if (this->rssi_sensor_ != nullptr) {
+    this->rssi_sensor_->publish_state(rssi);
+  }
 }
-}
+
+}  // namespace radio_analyzer
+}  // namespace esphome
