@@ -7,20 +7,34 @@
 namespace esphome {
 namespace radio_analyzer {
 
-class RadioAnalyzer : public Component, public sx127x::SX127xListener {
+class RadioAnalyzer : public Component,
+                      public sx127x::SX127xListener {
  public:
+
   void setup() override;
-  void dump_config() override;
+  void loop() override;
 
   void set_rssi_sensor(sensor::Sensor *sensor) {
     this->rssi_sensor_ = sensor;
   }
 
-  void on_packet(const std::vector<uint8_t> &packet, float rssi, float snr) override;
+  void set_radio(sx127x::SX127x *radio) {
+    this->radio_ = radio;
+  }
+
+  void on_packet(
+      const std::vector<uint8_t> &packet,
+      float rssi,
+      float snr
+  ) override;
+
 
  protected:
+
+  sx127x::SX127x *radio_{nullptr};
+
   sensor::Sensor *rssi_sensor_{nullptr};
-  uint32_t packet_count_{0};
+
 };
 
 }  // namespace radio_analyzer
