@@ -10,16 +10,24 @@ namespace radio_analyzer {
 class RadioAnalyzer : public Component,
                       public sx127x::SX127xListener {
  public:
-
   void setup() override;
   void loop() override;
+
+  // S'assure que le composant attend que le SX127x soit prêt avant de se lancer
+  float get_setup_priority() const override { 
+    return setup_priority::LATE; 
+  }
+
+  void set_radio(sx127x::SX127x *radio) {
+    this->radio_ = radio;
+  }
 
   void set_rssi_sensor(sensor::Sensor *sensor) {
     this->rssi_sensor_ = sensor;
   }
 
-  void set_radio(sx127x::SX127x *radio) {
-    this->radio_ = radio;
+  void set_snr_sensor(sensor::Sensor *sensor) {
+    this->snr_sensor_ = sensor;
   }
 
   void on_packet(
@@ -28,13 +36,10 @@ class RadioAnalyzer : public Component,
       float snr
   ) override;
 
-
  protected:
-
   sx127x::SX127x *radio_{nullptr};
-
   sensor::Sensor *rssi_sensor_{nullptr};
-
+  sensor::Sensor *snr_sensor_{nullptr};
 };
 
 }  // namespace radio_analyzer
