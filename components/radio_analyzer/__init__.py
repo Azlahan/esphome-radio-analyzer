@@ -17,7 +17,7 @@ CONF_SNR = "snr"
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(RadioAnalyzer),
-        cv.Required(CONF_RADIO_ID): cv.use_id(sx127x.SX127XDevice),
+        cv.Required(CONF_RADIO_ID): cv.use_id(sx127x.SX127xComponent),
         cv.Optional(CONF_RSSI): sensor.sensor_schema(
             accuracy_decimals=0,
             device_class="signal_strength",
