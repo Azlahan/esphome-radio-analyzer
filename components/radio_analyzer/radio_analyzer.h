@@ -13,7 +13,6 @@ class RadioAnalyzer : public Component,
   void setup() override;
   void loop() override;
 
-  // S'assure que le composant attend que le SX127x soit prêt avant de se lancer
   float get_setup_priority() const override { 
     return setup_priority::LATE; 
   }
@@ -29,6 +28,9 @@ class RadioAnalyzer : public Component,
   void set_snr_sensor(sensor::Sensor *sensor) {
     this->snr_sensor_ = sensor;
   }
+
+  // Cette fonction va envoyer la trame de réveil au compteur
+  void trigger_read();
 
   void on_packet(
       const std::vector<uint8_t> &packet,
