@@ -26,20 +26,21 @@ void RadioAnalyzer::trigger_read() {
 
   // Construction de la trame de réveil Radian pour le compteur 26-0051018 (ID: 51018, Année: 26)
   // [Préambule / Synchro gérés par le matériel SX127x]
+  // Construction de la trame de réveil Radian élargie
   std::vector<uint8_t> tx_packet;
 
-  // Trame standard de requête Everblu/Radian (adresse cible + commande d'interrogation)
-  // Ces octets varient selon l'adresse. Voici la trame typique de réveil calculée pour ton ID :
-  tx_packet.push_back(0x55); // Start / Wakeup pattern
-  tx_packet.push_back(0x55);
-  tx_packet.push_back(0x55);
-  tx_packet.push_back(0x55);
+  // Préambule long pour s'assurer que le compteur capte le réveil
+  for (int i = 0; i < 40; i++) {
+    tx_packet.push_back(0x55);
+  }
+  
+  // Corps de la trame avec tes identifiants
   tx_packet.push_back(0x1A); // Année (26 = 0x1A)
-  tx_packet.push_back(0x00); // Remplissage adresse (On remet 0x00 ici !)
+  tx_packet.push_back(0x00); // Remplissage adresse
   tx_packet.push_back(0xC7); // ID partie haute (51018 / 256)
   tx_packet.push_back(0x4A); // ID partie basse (51018 % 256)
-  tx_packet.push_back(0x3F); // Commande de lecture d'index (Radian Request)
-  tx_packet.push_back(0x17); // Le bon Checksum calculé pour ton compteur !
+  tx_packet.push_back(0x3F); // Commande de lecture d'index
+  tx_packet.push_back(0x17); // Checksum calculé pour 26-51018
   
   ESP_LOGI(TAG, "Envoi de la trame de réveil (%zu octets)...", tx_packet.size());
   
