@@ -35,11 +35,11 @@ void RadioAnalyzer::trigger_read() {
   tx_packet.push_back(0x55);
   tx_packet.push_back(0x55);
   tx_packet.push_back(0x1A); // Année (26 = 0x1A)
-  tx_packet.push_back(0x00); // Remplissage adresse
+  tx_packet.push_back(0x00); // Remplissage adresse (On remet 0x00 ici !)
   tx_packet.push_back(0xC7); // ID partie haute (51018 / 256)
   tx_packet.push_back(0x4A); // ID partie basse (51018 % 256)
   tx_packet.push_back(0x3F); // Commande de lecture d'index (Radian Request)
-  tx_packet.push_back(0x10); // Checksum de base
+  tx_packet.push_back(0x17); // Le bon Checksum calculé pour ton compteur !
   
   ESP_LOGI(TAG, "Envoi de la trame de réveil (%zu octets)...", tx_packet.size());
   
