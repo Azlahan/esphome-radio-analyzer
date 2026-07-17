@@ -36,7 +36,7 @@ async def to_code(config):
     
     # Liaison avec le module radio
     radio = await cg.get_variable(config[CONF_RADIO_ID])
-    cg.add(var.set_rx_device(radio))
+    cg.add(var.set_radio(radio))
     
     # Enregistrement du capteur RSSI s'il est configuré
     if CONF_RSSI in config:
