@@ -7,95 +7,95 @@ esp32:
   framework:
     type: arduino
 
-# --- CONFIGURATION RÉSEAU ET WI-FI ---
+# --- CONFIGURATION RÉSEAU (À ADAPTER EN LOCAL) ---
 wifi:
-  ssid: "MON_RESEAU_WIFI"      # À remplacer par le nom de ta box/routeur
-  password: "MON_MOT_DE_PASSE" # À remplacer par la clé de sécurité
+  ssid: "TON_SSID_WIFI"
+  password: "TON_MOT_DE_PASSE"
   
-  # Optionnel mais recommandé : Un point d'accès de secours si le Wi-Fi principal est coupé
   ap:
     ssid: "Radio-Analyzer-Fallback"
     password: "analyzer_fallback"
 
-# Gère la page web locale de l'ESP32 pour voir les logs et le RSSI depuis un navigateur
 web_server:
   port: 80
 
-# Activer l'API pour Home Assistant
 api:
 
-# Permet les mises à jour sans fil (Over-The-Air)[cite: 5]
 ota:
   - platform: esphome
 
 logger:
-  level: INFO # Niveau INFO recommandé pour bien voir les paquets captés[cite: 5]
+  level: INFO
 
-# --- CONFIGURATION HARDWARE DE LA LILYGO ---
+# --- IMPORTATION DU COMPOSANT DEPUIS GITHUB ---
+external_components:
+  - source:
+      type: git
+      url: https://github.com/Azlahan/esphome-radio-analyzer
+      ref: main
+      path: components
+    components: [ radio_analyzer ]
 
-# Configuration SPI spécifique à ta carte LilyGO T3 V1.6.1[cite: 5]
+# --- CONFIGURATION MATÉRIELLE LILYGO LORA32 T3 V1.6.1 ---
+
 spi:
   clk_pin: GPIO5
   mosi_pin: GPIO27
   miso_pin: GPIO19
 
-# Connexion I2C pour l'écran OLED embarqué[cite: 5]
 i2c:
   sda: GPIO21
   scl: GPIO22
 
-# Configuration du module SX1278 (version 433 MHz)[cite: 5]
+# Configuration du module de réception radio SX1278 (433 MHz)
 sx127x:
   id: my_sx1278
   cs_pin: GPIO18
   rst_pin: GPIO23
   dio0_pin: GPIO26
-  frequency: 433.92MHz[cite: 5]
+  frequency: 433.92 MHz
+  modulation: FSK
+  bitsync: true
+  packet_mode: true
 
-# Charge ton dossier local de composants personnalisés[cite: 5]
-external_components:
-  - source:
-      type: local
-      path: ../components # Remonte d'un dossier depuis "examples" pour trouver "components"[cite: 5]
-
-# Configuration de ton analyseur[cite: 5]
+# Configuration de l'analyseur
 radio_analyzer:
-  id: my_analyzer[cite: 5]
-  radio_id: my_sx1278[cite: 5]
+  id: my_analyzer
+  radio_id: my_sx1278
   rssi:
-    id: radio_rssi[cite: 5]
-    name: "Force du signal (RSSI)"[cite: 5]
+    id: radio_rssi
+    name: "Force du signal (RSSI)"
   snr:
-    id: radio_snr[cite: 5]
-    name: "Rapport signal/bruit (SNR)"[cite: 5]
+    id: radio_snr
+    name: "Rapport signal/bruit (SNR)"
 
-# Exemple d'utilisation de l'écran OLED[cite: 5]
+# --- AFFICHAGE SUR L'ÉCRAN OLED EMBARQUÉ (128x64) ---
 font:
-  - file: "gfonts://Roboto"[cite: 5]
-    id: roboto_font[cite: 5]
-    size: 11[cite: 5]
+  - file: "gfonts://Roboto"
+    id: roboto_font
+    size: 11
 
 display:
-  - platform: ssd1306_i2c[cite: 5]
-    model: "SSD1306 128x64"[cite: 5]
-    address: 0x3C[cite: 5]
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    address: 0x3C
     lambda: |-
-      it.printf(0, 0, id(roboto_font), "Radio Analyzer 433Mhz");[cite: 5]
-      it.draw_line(0, 14, 127, 14);[cite: 5]
+      it.printf(0, 0, id(roboto_font), "Radio Analyzer 433Mhz");
+      it.draw_line(0, 14, 127, 14);
       
-      if (id(radio_rssi).has_state()) {[cite: 5]
-        it.printf(0, 18, id(roboto_font), "RSSI: %.0f dBm", id(radio_rssi).state);[cite: 5]
+      if (id(radio_rssi).has_state()) {
+        it.printf(0, 18, id(roboto_font), "RSSI: %.0f dBm", id(radio_rssi).state);
         
-        // Jauge dynamique du RSSI[cite: 5]
-        float raw_rssi = id(radio_rssi).state;[cite: 5]
-        int bar_width = map(raw_rssi, -120, -30, 0, 120);[cite: 5]
-        bar_width = constrain(bar_width, 0, 120);[cite: 5]
-        it.draw_rectangle(0, 32, 120, 8);[cite: 5]
-        it.filled_rectangle(0, 32, bar_width, 8);[cite: 5]
+        // Jauge visuelle dynamique du RSSI
+        float raw_rssi = id(radio_rssi).state;
+        int bar_width = map(raw_rssi, -120, -30, 0, 120);
+        bar_width = constrain(bar_width, 0, 120);
+        it.draw_rectangle(0, 32, 120, 8);
+        it.filled_rectangle(0, 32, bar_width, 8);
       } else {
-        it.printf(0, 18, id(roboto_font), "En attente d'un signal...");[cite: 5]
+        it.printf(0, 18, id(roboto_font), "En attente de signal...");
       }
 
-      if (id(radio_snr).has_state()) {[cite: 5]
-        it.printf(0, 45, id(roboto_font), "SNR: %.1f dB", id(radio_snr).state);[cite: 5]
+      if (id(radio_snr).has_state()) {
+        it.printf(0, 45, id(roboto_font), "SNR: %.1f dB", id(radio_snr).state);
       }
